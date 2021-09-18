@@ -10,6 +10,7 @@ import CityWeather from './components/city-weather'
 const App = () => {
   const [text, setText] = useState('')
   const [number, setNumber] = useState(10)
+  const [orientation, setOrientation] = useState('portrait')
   const [images, setImages] = useState([])
   const [weather, setWeather] = useState()
   const [view, setView] = useState('col-sm-3')
@@ -34,7 +35,7 @@ const App = () => {
   }
 
   const handleGetPhotos = async ({ text, number }) => {
-    const res = await getPhotos({ text, number })
+    const res = await getPhotos({ text, number, orientation })
     setImages(res)
   }
 
@@ -52,13 +53,13 @@ const App = () => {
   }
 
   return (
-    <div className="container">
+    <div className="container theme">
       <form onSubmit={handleSubmit}>
         <label>
-          Name:
-          <input type="text" value={text} onChange={handleChange} />
+          Search city:
+          <input type="text" className="form-control" value={text} onChange={handleChange} />
         </label>
-        <input type="submit" value="Submit" />
+        <button type="submit" className="btn btn-primary">Submit</button>
       </form>
 
       {weather && (
@@ -66,7 +67,18 @@ const App = () => {
       )}
 
       <div className="row">
-        <button onClick={changeView}>Change View</button>
+        <div className="btn-group btn-group-toggle" data-toggle="buttons">
+          <label className={orientation === 'portrait' ? "btn btn-secondary active" : "btn btn-secondary"}>
+            <input type="radio" name="options" id="option1" onClick={() => setOrientation('portrait')} /> Portrait
+          </label>
+          <label className={orientation === 'landscape' ? "btn btn-secondary active" : "btn btn-secondary"}>
+            <input type="radio" name="options" id="option2" onClick={() => setOrientation('landscape')} /> Landscape
+          </label>
+        </div>
+      </div>
+
+      <div className="row">
+        <button type="button" className="btn btn-outline-primary" onClick={changeView}>Change View</button>
       </div>
 
       <PhotoList images={images} view={view} showMore={handleShowMore}></PhotoList>

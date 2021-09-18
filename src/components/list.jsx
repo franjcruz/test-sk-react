@@ -15,7 +15,7 @@ const PhotoList = ({ images, view, showMore }) => {
         })}
       </div>
 
-      <button onClick={showMore}>Show more...</button>
+      <button type="button" className="btn btn-outline-primary" onClick={showMore} disabled={!images || images.length === 0}>Show more...</button>
     </>
   )
 }

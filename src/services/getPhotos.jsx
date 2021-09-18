@@ -2,8 +2,8 @@ import { createApi } from 'unsplash-js'
 
 const unsplash = createApi({ accessKey: 'w3fZVAUR6G3uUITPYA5MhBT7yAvBqCSQmUDK--RdXoM' })
 
-const getPhotos = async ({ text, number = 10 }) => {
-  const result = await unsplash.search.getPhotos({ query: text, perPage: number })
+const getPhotos = async ({ text, number = 10, orientation = 'portrait' }) => {
+  const result = await unsplash.search.getPhotos({ query: text, perPage: number, orientation: orientation })
 
   if (result.errors) {
     // handle error here

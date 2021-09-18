@@ -36,3 +36,9 @@
     transform: rotate(360deg);
   }
 }
+.theme {
+   --color: blue;
+   --bg-color: white;
+     background-color: var(--bg-color);
+     color: (--color);
+ }
