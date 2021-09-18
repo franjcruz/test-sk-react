@@ -2,55 +2,57 @@
 import './App.css'
 import React, { useState } from 'react'
 
-import { createApi } from 'unsplash-js'
 import PhotoList from './components/list'
-
-const unsplash = createApi({ accessKey: 'w3fZVAUR6G3uUITPYA5MhBT7yAvBqCSQmUDK--RdXoM' })
+import getPhotos from './services/getPhotos'
+import getWeather from './services/getWeather'
+import CityWeather from './components/city-weather'
 
 const App = () => {
   const [text, setText] = useState('')
+  const [number, setNumber] = useState(10)
   const [images, setImages] = useState([])
-  const [view, setView] = useState('col-sm-2')
-
-  const getPhotos = (text) => {
-    unsplash.search.getPhotos({ query: text, perPage: 10 }).then(result => {
-      if (result.errors) {
-        // handle error here
-        console.log('error occurred: ', result.errors[0])
-      } else {
-        const feed = result.response
-
-        // extract total and results array from response
-        const { total, results } = feed
-
-        // handle success here
-        console.log(`received ${results.length} photos out of ${total}`)
-        console.log('first photo: ', results[0])
-
-        setImages(results)
-      }
-    })
-  }
+  const [weather, setWeather] = useState()
+  const [view, setView] = useState('col-sm-3')
 
   const handleChange = (event) => {
     setText(event.target.value)
   }
 
   const changeView = () => {
-    setView(view === 'col-sm-2' ? 'col-sm-6' : 'col-sm-2')
+    setView(view === 'col-sm-3' ? 'col-sm-6' : 'col-sm-3')
+  }
+
+  const handleGetWeather = async (city) => {
+    try {
+      const res = await getWeather(city)
+      setWeather(res)
+      handleGetPhotos({ text: res.weather[0].description, number: 10 })
+    } catch {
+      setWeather()
+      alert('City not found')
+    }
+  }
+
+  const handleGetPhotos = async ({ text, number }) => {
+    const res = await getPhotos({ text, number })
+    setImages(res)
   }
 
   const handleSubmit = (event) => {
-    console.log('A name was submitted: ' + text)
     event.preventDefault()
+    setNumber(10)
 
-    getPhotos(text)
+    handleGetWeather(text)
+  }
 
-    console.log(images)
+  const handleShowMore = () => {
+    setNumber(number + 10)
+
+    handleGetPhotos({ text: weather.weather[0].description, number: number + 10 })
   }
 
   return (
-    <>
+    <div className="container">
       <form onSubmit={handleSubmit}>
         <label>
           Name:
@@ -59,10 +61,16 @@ const App = () => {
         <input type="submit" value="Submit" />
       </form>
 
-      <button onClick={changeView}>Change View</button>
+      {weather && (
+        <CityWeather weather={weather}></CityWeather>
+      )}
 
-      <PhotoList images={images} view={view}></PhotoList>
-    </>
+      <div className="row">
+        <button onClick={changeView}>Change View</button>
+      </div>
+
+      <PhotoList images={images} view={view} showMore={handleShowMore}></PhotoList>
+    </div>
   )
 }
 
